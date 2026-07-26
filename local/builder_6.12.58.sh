@@ -6,11 +6,11 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # ===== 设置自定义参数 =====
-echo "===== 新版米系/欧加真通用 6.12.23 GKI内核本地编译脚本 By Coolapk@cctv18 ====="
+echo "===== 欧加真SM8850通用6.12.58 A16 OKI内核本地编译脚本 By Coolapk@cctv18 ====="
 echo ">>> 读取用户配置..."
-MANIFEST=${MANIFEST:-oppo+oplus+realme+mi}
-read -p "请输入自定义内核后缀（默认：android16-5-ge7f2a9832757-ab13799791-4k）: " CUSTOM_SUFFIX
-CUSTOM_SUFFIX=${CUSTOM_SUFFIX:-android16-5-ge7f2a9832757-ab13799791-4k}
+MANIFEST=${MANIFEST:-oppo+oplus+realme}
+read -p "请输入自定义内核后缀（默认：android16-5-ga8f88ad96df3-ab13929693-4k）: " CUSTOM_SUFFIX
+CUSTOM_SUFFIX=${CUSTOM_SUFFIX:-android16-5-ga8f88ad96df3-ab13929693-4k}
 read -p "是否启用susfs？(y/n，默认：y): " APPLY_SUSFS
 APPLY_SUSFS=${APPLY_SUSFS:-y}
 read -p "是否启用 KPM？(y-启用 KpatchNext独立kpm实现, n-关闭kpm，默认：n): " USE_PATCH_LINUX
@@ -29,8 +29,6 @@ read -p "是否添加 Droidspaces 容器支持？(n禁用/s标准/e扩展，默�
 APPLY_DROIDSPACES=${APPLY_DROIDSPACES:-n}
 read -p "是否启用ADIOS调度器？(y/n，默认：y): " APPLY_ADIOS
 APPLY_ADIOS=${APPLY_ADIOS:-y}
-read -p "是否启用用户命名空间支持？(y/n，默认：y): " APPLY_USER_NS
-APPLY_USER_NS=${APPLY_USER_NS:-y}
 read -p "是否启用Re-Kernel？(y/n，默认：n): " APPLY_REKERNEL
 APPLY_REKERNEL=${APPLY_REKERNEL:-n}
 read -p "是否启用内核级基带保护？(y/n，默认：y): " APPLY_BBG
@@ -61,7 +59,6 @@ echo "应用网络功能增强优化配置: $APPLY_BETTERNET"
 echo "应用 BBR 等算法: $APPLY_BBR"
 echo "应用 Droidspaces 容器支持: $APPLY_DROIDSPACES"
 echo "启用ADIOS调度器: $APPLY_ADIOS"
-echo "启用用户命名空间: $APPLY_USER_NS"
 echo "启用Re-Kernel: $APPLY_REKERNEL"
 echo "启用内核级基带保护: $APPLY_BBG"
 echo "===================="
@@ -94,9 +91,9 @@ mkdir kernel_workspace
 cd kernel_workspace
 
 echo "正在克隆源码仓库..."
-aria2c -s16 -x16 -k1M https://github.com/cctv18/android_gki_kernel_common/archive/refs/heads/android16-6.12-2025-06.zip -o common.zip &&
-unzip -q common.zip &&
-mv "android_gki_kernel_common-android16-6.12-2025-06" common &&
+aria2c -s16 -x16 -k1M https://github.com/cctv18/android_kernel_common_oneplus_sm8850/archive/refs/heads/oneplus/sm8850_b_16.0_pad_3_pro.zip -o common.zip && 
+unzip -q common.zip && 
+mv "android_kernel_common_oneplus_sm8850-oneplus-sm8850_b_16.0_pad_3_pro" common &&
 rm -rf common.zip &
 
 echo "正在克隆llvm-clang19工具链..." &&
@@ -370,12 +367,6 @@ if [[ "$APPLY_ADIOS" == "y" || "$APPLY_ADIOS" == "Y" ]]; then
   echo "CONFIG_MQ_IOSCHED_DEFAULT_ADIOS=y" >> "$DEFCONFIG_FILE"
 fi
 
-# ===== 启用用户命名空间 =====
-if [[ "$APPLY_USER_NS" == "y" || "$APPLY_USER_NS" == "Y" ]]; then
-  echo ">>> 正在启用用户命名空间支持..."
-  echo "CONFIG_USER_NS=y" >> "$DEFCONFIG_FILE"
-fi
-
 # ===== 启用Re-Kernel =====
 if [[ "$APPLY_REKERNEL" == "y" || "$APPLY_REKERNEL" == "Y" ]]; then
   echo ">>> 正在启用Re-Kernel..."
@@ -518,9 +509,6 @@ if [[ "$APPLY_DROIDSPACES" == [sSeE] ]]; then
 fi
 if [[ "$APPLY_ADIOS" == "y" || "$APPLY_ADIOS" == "Y" ]]; then
   ZIP_NAME="${ZIP_NAME}-adios"
-fi
-if [[ "$APPLY_USER_NS" == "y" || "$APPLY_USER_NS" == "Y" ]]; then
-  ZIP_NAME="${ZIP_NAME}-uns"
 fi
 if [[ "$APPLY_REKERNEL" == "y" || "$APPLY_REKERNEL" == "Y" ]]; then
   ZIP_NAME="${ZIP_NAME}-rek"

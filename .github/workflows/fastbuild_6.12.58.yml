@@ -1,12 +1,12 @@
-name: 6.12.38 欧加真OKI内核快速构建
+name: 6.12.58 欧加真OKI内核快速构建
 
 env:
   TZ: Asia/Shanghai
   ANDROID_VERSION: 'android16'
   KERNEL_VERSION: '6.12'
-  SUB_VERSION: '38'
+  SUB_VERSION: '58'
   KERNEL_NAME: 'android16-5-g8c67d4274c0a-ab14275539-4k'
-  CCACHE_KEY: ccache-ecsv4-6.12.38
+  CCACHE_KEY: ccache-ecsv4-6.12.58
 
 on:
   workflow_dispatch:
@@ -70,11 +70,6 @@ on:
         required: true
         type: boolean
         default: 'true'
-      user_ns_enable:
-        description: '是否启用用户命名空间支持(rootless容器如podman等需要，提供进程权限隔离)'
-        required: true
-        type: boolean
-        default: 'true'
       rekernel_enable:
         description: '是否启用Re-Kernel支持(与Freezer/NoActive等软件配合, 提升应用冻结能力)'
         required: true
@@ -135,9 +130,9 @@ jobs:
           rm -f ./ccache &
           
           echo "正在克隆源码仓库..."
-          aria2c -s16 -x16 -k1M https://github.com/cctv18/android_kernel_common_oneplus_sm8845/archive/refs/heads/oneplus/sm8845_b_16.0.0_ace_6t.zip -o common.zip && 
+          aria2c -s16 -x16 -k1M https://github.com/cctv18/android_kernel_common_oneplus_sm8850/archive/refs/heads/oneplus/sm8850_b_16.0_pad_3_pro.zip -o common.zip && 
           unzip -q common.zip && 
-          mv "android_kernel_common_oneplus_sm8845-oneplus-sm8845_b_16.0.0_ace_6t" common &&
+          mv "android_kernel_common_oneplus_sm8850-oneplus-sm8850_b_16.0_pad_3_pro" common &&
           rm -rf common.zip &
           
           echo "正在克隆llvm-clang19工具链..." &&
@@ -527,13 +522,6 @@ jobs:
           echo "CONFIG_MQ_IOSCHED_ADIOS=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_MQ_IOSCHED_DEFAULT_ADIOS=y" >> ./common/arch/arm64/configs/gki_defconfig
 
-      - name: 启用用户命名空间支持
-        if: inputs.user_ns_enable
-        run: |
-          echo "正在启用用户命名空间支持..."
-          cd kernel_workspace
-          echo "CONFIG_USER_NS=y" >> ./common/arch/arm64/configs/gki_defconfig
-
       - name: 启用Re-Kernel支持
         if: inputs.rekernel_enable
         run: |
@@ -784,7 +772,6 @@ jobs:
           echo "BBR&Brutal: ${{ github.event.inputs.bbr_enable }}" >> ./ak3.log
           echo "Droidspaces: ${{ github.event.inputs.droidspaces_enable }}" >> ./ak3.log
           echo "ADIOS: ${{ github.event.inputs.adios_enable }}" >> ./ak3.log
-          echo "UserNS: ${{ github.event.inputs.user_ns_enable }}" >> ./ak3.log
           echo "Re-Kernel: ${{ github.event.inputs.rekernel_enable }}" >> ./ak3.log
           echo "BBG: ${{ github.event.inputs.baseband_guard }}" >> ./ak3.log
           zip -z ../$AK3_NAME < ./ak3.log
@@ -869,7 +856,6 @@ jobs:
           - BBR/Brutal 等拥塞控制算法支持：${{ github.event.inputs.bbr_enable }}
           - Droidspaces 容器支持：${{ github.event.inputs.droidspaces_enable }}
           - ADIOS IO调度器支持：${{ github.event.inputs.adios_enable }}
-          - 用户命名空间支持：${{ github.event.inputs.user_ns_enable }}
           - Re-Kernel支持：${{ github.event.inputs.rekernel_enable }}
           - 内核级基带保护支持：${{ github.event.inputs.baseband_guard }}
           - ReSukiSU管理器下载：[ReSukiSU_CI](https://github.com/cctv18/ReSukiSU_CI/releases)

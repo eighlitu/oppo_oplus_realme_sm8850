@@ -70,6 +70,11 @@ on:
         required: true
         type: boolean
         default: 'true'
+      user_ns_enable:
+        description: '是否启用用户命名空间支持(rootless容器如podman等需要，提供进程权限隔离)'
+        required: true
+        type: boolean
+        default: 'true'
       rekernel_enable:
         description: '是否启用Re-Kernel支持(与Freezer/NoActive等软件配合, 提升应用冻结能力)'
         required: true
@@ -517,6 +522,13 @@ jobs:
           echo "CONFIG_MQ_IOSCHED_ADIOS=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_MQ_IOSCHED_DEFAULT_ADIOS=y" >> ./common/arch/arm64/configs/gki_defconfig
 
+      - name: 启用用户命名空间支持
+        if: inputs.user_ns_enable
+        run: |
+          echo "正在启用用户命名空间支持..."
+          cd kernel_workspace
+          echo "CONFIG_USER_NS=y" >> ./common/arch/arm64/configs/gki_defconfig
+
       - name: 启用Re-Kernel支持
         if: inputs.rekernel_enable
         run: |
@@ -767,6 +779,7 @@ jobs:
           echo "BBR&Brutal: ${{ github.event.inputs.bbr_enable }}" >> ./ak3.log
           echo "Droidspaces: ${{ github.event.inputs.droidspaces_enable }}" >> ./ak3.log
           echo "ADIOS: ${{ github.event.inputs.adios_enable }}" >> ./ak3.log
+          echo "UserNS: ${{ github.event.inputs.user_ns_enable }}" >> ./ak3.log
           echo "Re-Kernel: ${{ github.event.inputs.rekernel_enable }}" >> ./ak3.log
           echo "BBG: ${{ github.event.inputs.baseband_guard }}" >> ./ak3.log
           zip -z ../$AK3_NAME < ./ak3.log
@@ -851,6 +864,7 @@ jobs:
           - BBR/Brutal 等拥塞控制算法支持：${{ github.event.inputs.bbr_enable }}
           - Droidspaces 容器支持：${{ github.event.inputs.droidspaces_enable }}
           - ADIOS IO调度器支持：${{ github.event.inputs.adios_enable }}
+          - 用户命名空间支持：${{ github.event.inputs.user_ns_enable }}
           - Re-Kernel支持：${{ github.event.inputs.rekernel_enable }}
           - 内核级基带保护支持：${{ github.event.inputs.baseband_guard }}
           - ReSukiSU管理器下载：[ReSukiSU_CI](https://github.com/cctv18/ReSukiSU_CI/releases)

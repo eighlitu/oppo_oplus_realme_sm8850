@@ -29,6 +29,8 @@ read -p "是否添加 Droidspaces 容器支持？(n禁用/s标准/e扩展，默�
 APPLY_DROIDSPACES=${APPLY_DROIDSPACES:-n}
 read -p "是否启用ADIOS调度器？(y/n，默认：y): " APPLY_ADIOS
 APPLY_ADIOS=${APPLY_ADIOS:-y}
+read -p "是否启用用户命名空间支持？(y/n，默认：y): " APPLY_USER_NS
+APPLY_USER_NS=${APPLY_USER_NS:-y}
 read -p "是否启用Re-Kernel？(y/n，默认：n): " APPLY_REKERNEL
 APPLY_REKERNEL=${APPLY_REKERNEL:-n}
 read -p "是否启用内核级基带保护？(y/n，默认：y): " APPLY_BBG
@@ -59,6 +61,7 @@ echo "应用网络功能增强优化配置: $APPLY_BETTERNET"
 echo "应用 BBR 等算法: $APPLY_BBR"
 echo "应用 Droidspaces 容器支持: $APPLY_DROIDSPACES"
 echo "启用ADIOS调度器: $APPLY_ADIOS"
+echo "启用用户命名空间: $APPLY_USER_NS"
 echo "启用Re-Kernel: $APPLY_REKERNEL"
 echo "启用内核级基带保护: $APPLY_BBG"
 echo "===================="
@@ -360,6 +363,12 @@ if [[ "$APPLY_ADIOS" == "y" || "$APPLY_ADIOS" == "Y" ]]; then
   echo "CONFIG_MQ_IOSCHED_DEFAULT_ADIOS=y" >> "$DEFCONFIG_FILE"
 fi
 
+# ===== 启用用户命名空间 =====
+if [[ "$APPLY_USER_NS" == "y" || "$APPLY_USER_NS" == "Y" ]]; then
+  echo ">>> 正在启用用户命名空间支持..."
+  echo "CONFIG_USER_NS=y" >> "$DEFCONFIG_FILE"
+fi
+
 # ===== 启用Re-Kernel =====
 if [[ "$APPLY_REKERNEL" == "y" || "$APPLY_REKERNEL" == "Y" ]]; then
   echo ">>> 正在启用Re-Kernel..."
@@ -502,6 +511,9 @@ if [[ "$APPLY_DROIDSPACES" == [sSeE] ]]; then
 fi
 if [[ "$APPLY_ADIOS" == "y" || "$APPLY_ADIOS" == "Y" ]]; then
   ZIP_NAME="${ZIP_NAME}-adios"
+fi
+if [[ "$APPLY_USER_NS" == "y" || "$APPLY_USER_NS" == "Y" ]]; then
+  ZIP_NAME="${ZIP_NAME}-uns"
 fi
 if [[ "$APPLY_REKERNEL" == "y" || "$APPLY_REKERNEL" == "Y" ]]; then
   ZIP_NAME="${ZIP_NAME}-rek"
